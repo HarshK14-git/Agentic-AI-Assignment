@@ -1,1 +1,218 @@
+Automated Payment Reminder System Using Zapier
+Project Links:
+Zapier Workflow: https://agents.zapier.com/copy/fbfecf08-a95a-44f2-ac67-553db6579344
+Google Sheets – P-0: https://docs.google.com/spreadsheets/d/1S9JN3F1sPFXBO_2BXQvPJv_Nlb7zlJLMZ0Hvy83yqns/edit?gid=0#gid=0
 
+An automated invoice follow-up solution built with Zapier, Google Sheets, Google Drive, and Gmail to identify outstanding payments, send personalized email reminders, and maintain invoice tracking records.
+
+Project Overview
+
+The Automated Payment Reminder System streamlines the process of monitoring pending invoices and communicating payment reminders to designated recipients. By integrating spreadsheet data with email automation, the workflow reduces repetitive manual work and improves the consistency of payment follow-ups.
+
+The project uses the P-0 Google Sheets spreadsheet as its invoice data source. Zapier retrieves invoice records, evaluates payment statuses, applies conditional rules, sends customized reminder emails, and updates the corresponding spreadsheet records.
+
+Objectives
+
+Automate the identification of invoices with pending payments.
+
+Retrieve invoice information directly from Google Sheets.
+
+Apply conditional logic to select eligible records.
+
+Generate personalized payment reminder emails using dynamic spreadsheet values.
+
+Route reminders according to invoice type and configured recipients.
+
+Update reminder tracking fields after successful email delivery.
+
+Maintain a record of email activity for monitoring and auditing.
+
+Tools and Technologies
+
+Technology
+
+Purpose
+
+Zapier
+
+Workflow orchestration and automation
+
+Google Sheets
+
+Invoice storage, payment status tracking, and updates
+
+Google Drive
+
+Spreadsheet discovery and file access
+
+Gmail
+
+Automated payment reminder delivery
+
+CSV / Excel
+
+Structured invoice data management, where applicable
+
+Workflow Architecture
+
+       Schedule Trigger
+        (Daily at 9 AM)
+               |
+               v
+ Google Drive - Locate P-0
+               |
+               v
+ Google Sheets - Retrieve Rows
+               |
+               v
+   Filter: Status = Pending
+               |
+               v
+   Validate Recipient and Type
+               |
+               v
+      Select Email Recipient
+        /              \
+ Maintenance            Project
+      |                    |
+      v                    v
+  Recipient A1         Recipient A2
+        \                 /
+         v               v
+       Gmail - Send Reminder
+               |
+               v
+ Update Reminder Tracking
+               |
+               v
+       Record Email Activity
+
+How It Works
+
+1. Scheduled Execution
+
+The workflow is configured to run daily at 9:00 AM, allowing invoice records to be checked automatically without manual intervention.
+
+2. Invoice Data Retrieval
+
+Zapier accesses the Google Sheets document named P-0 and retrieves the available invoice records.
+
+The workflow uses fields such as:
+
+Invoice ID
+
+Invoice Type
+
+Customer Name
+
+Amount
+
+Account Number
+
+Bank Name
+
+Payment Status
+
+Transaction ID
+
+Reminder Count
+
+3. Conditional Filtering
+
+The retrieved records are evaluated to identify invoices whose Status is exactly Pending.
+
+Records marked Completed, Paid, or with another status are excluded from the first-reminder process.
+
+The workflow also checks that a valid, authorized recipient is available before attempting to send an email.
+
+4. Recipient Selection
+
+The recipient is determined by the invoice Type field:
+
+Maintenance: Route the reminder to the configured A1 recipient.
+
+Project: Route the reminder to the configured A2 recipient.
+
+Only explicitly configured recipients are eligible to receive emails.
+
+5. Personalized Email Generation
+
+For each eligible invoice, Zapier maps the relevant spreadsheet values into a payment reminder email.
+
+The message includes the invoice number, pending amount, payment type, and available banking information. This dynamic mapping allows the same workflow to handle multiple invoices without manually composing each message.
+
+6. Spreadsheet Update
+
+After an email is successfully sent, Zapier updates the relevant invoice record to reflect the reminder activity.
+
+Depending on the workflow configuration, this can include updating the reminder count, recording a timestamp, and logging the sending result.
+
+Only the intended fields should be modified, preserving unrelated invoice information.
+
+Extended Workflow Capabilities
+
+The project can incorporate additional automation stages to support more complete invoice follow-up.
+
+Payment Confirmation Tracking
+
+Gmail can be monitored for relevant replies confirming successful payment. After an authorized confirmation is matched to the correct invoice, the corresponding Status field can be updated from Pending to Completed.
+
+Transaction ID Management
+
+Verified transaction references can be stored against their matching invoice records. Transaction IDs must come from a reliable source and must not be generated arbitrarily.
+
+Second Reminder Automation
+
+Invoices that remain pending more than 24 hours after the first reminder can be selected for a second follow-up.
+
+Eligibility can be based on the invoice status, reminder count, transaction ID availability, escalation flag, and first-reminder timestamp. The second email can use HTML formatting to highlight overdue notices and escalation warnings in red.
+
+Key Features
+
+Scheduled invoice monitoring
+
+Automated retrieval of spreadsheet records
+
+Status-based filtering
+
+Invoice-type-based email routing
+
+Dynamic email content generation
+
+Gmail integration
+
+Automated spreadsheet updates
+
+Reminder count and timestamp tracking
+
+Payment confirmation processing
+
+Duplicate-reminder prevention
+
+Execution logging and error handling
+
+Expected Outcomes
+
+The system reduces manual effort in routine invoice follow-ups and establishes a structured process for tracking outstanding payments.
+
+It demonstrates how low-code automation can connect spreadsheet-based business data with email communication, conditional processing, and record updates.
+
+Important Notes
+
+Configure the actual authorized email addresses for A1 and A2 before running the workflow.
+
+Connect Google Drive, Google Sheets, and Gmail using authorized accounts.
+
+Test the workflow with sample invoice records before enabling automatic execution.
+
+Verify that email sending and spreadsheet updates succeed before marking a reminder as sent.
+
+Treat payment confirmation as a separate verification step rather than assuming that an email reply automatically proves payment.
+
+This project demonstrates an automation workflow; it does not independently verify bank transactions unless a verified payment data source is integrated.
+
+Conclusion
+
+The Automated Payment Reminder System demonstrates the practical application of workflow automation to invoice management. By integrating Zapier with Google Sheets and Gmail, it provides a repeatable approach to pending-payment identification, personalized reminders, payment-status tracking, and follow-up communication.
+
+The project illustrates how low-code automation can improve operational efficiency, reduce repetitive administrative tasks, and support more consistent financial record management.
