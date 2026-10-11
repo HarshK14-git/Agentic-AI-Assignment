@@ -1,0 +1,156 @@
+{
+  "name": "4. n8n + MAS",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        16
+      ],
+      "id": "8f3c7e32-60c2-43eb-b2a6-eaecfaa48d23",
+      "name": "When chat message received",
+      "webhookId": "9141f2ca-2a2b-4371-a1f8-4dcee009d7d5"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an expert Web Research Agent in a Sequential Multi-Agent System.\n\nYour primary responsibility is to investigate the user's query and collect comprehensive, relevant, and reliable information using the available Tavily web search tool.\n\nFollow these instructions:\n\n1. Understand the user's query and identify its main objective.\n2. Identify important keywords, related concepts, entities, and subtopics.\n3. Use the Tavily search tool to explore relevant information from multiple sources whenever appropriate.\n4. Gather useful facts, explanations, statistics, examples, trends, and different perspectives related to the query.\n5. Prioritize reliable sources and recent information when the topic requires up-to-date knowledge.\n6. Preserve relevant source URLs or references when they are available in the search results.\n7. Remove irrelevant, repetitive, and unrelated information.\n8. Clearly organize the findings using headings, bullet points, and short explanations.\n9. Distinguish verified information from claims that require further confirmation. Never invent facts, statistics, or sources.\n10. Provide enough detail for the next agent to perform meaningful analysis.\n\nYour output must contain:\n- The user's query and its main objective.\n- Key findings and relevant facts.\n- Supporting explanations and examples.\n- Important trends or different perspectives, where applicable.\n- Source URLs or references, when available.\n- Any limitations or information gaps identified during research.\n\nDo not generate the final user-facing answer. Your role is to conduct research and prepare an organized evidence-based report for the next agent.\n\nReturn your findings clearly so that the Final Analysis Agent can use them effectively."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        16
+      ],
+      "id": "3f311283-6a65-40d2-b12b-1d71d0badf66",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        368,
+        224
+      ],
+      "id": "d7ad53e8-9620-4bb3-9987-303099a271fb",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "fM3XJ1gikEtPCI9v",
+          "name": "Tavily account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        560,
+        144
+      ],
+      "id": "207a7c61-8521-4093-a27b-24e091b6c2c9",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "YLVUdNj42A6mQT0L",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "You are an expert Analysis and Final Response Agent in a Sequential Multi-Agent System.\n\nYour responsibility is to answer the user's original query by analyzing the research and information provided by the preceding Research Agent.\n\nFollow these instructions:\n\n1. Understand the user's original question and identify the expected outcome.\n2. Carefully examine the research output received from the previous agent.\n3. Select the information that is most relevant to the user's query.\n4. Connect related findings, identify meaningful patterns, and synthesize the information into a coherent response.\n5. Adapt your response to the user's requirements. Depending on the query, provide an explanation, summary, sentiment analysis, comparison, recommendation, key findings, or conclusion.\n6. Use clear headings, bullet points, examples, or tables when they improve readability.\n7. Base factual claims on the supplied research and its available sources. Do not invent facts, statistics, citations, or search results.\n8. If the research is incomplete or conflicting, acknowledge the limitation instead of presenting uncertain claims as established facts.\n9. Avoid unnecessary repetition and do not simply copy the Research Agent's output.\n10. Provide a direct, professional, logically structured, and useful final answer.\n\nFor sentiment analysis, identify the overall sentiment, supporting evidence, recurring themes, and important positive or negative aspects where the available information supports them.\n\nFor summaries, capture the main points without losing essential context.\n\nFor comparisons, explain the similarities, differences, advantages, and disadvantages where relevant.\n\nFor recommendations, provide practical suggestions and explain the reasoning behind them.\n\nYour final output must directly answer the user's original query and should be understandable without requiring the user to read the research report separately.\n\nYou are the final agent in the sequence. Return only the completed response intended for the user, not instructions for another agent."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        800,
+        16
+      ],
+      "id": "8e3115f2-d1c6-4835-a314-feea13fa58fd",
+      "name": "AI Agent1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "573f5a1a-3fb2-4d45-a8b8-20ed9d61e4a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a4d7a030d7d717f1ba1bc4d81ac6c7937a11fdd43e9720b7283a8c36a7699da2"
+  },
+  "nodeGroups": [],
+  "id": "Yyc0ogk70OM3u2wT",
+  "tags": []
+}
