@@ -1,0 +1,312 @@
+{
+  "name": "n8n + RAG(X)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a2413ace-d30e-43f7-86a0-6c73d523ad50",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1z6-_beuxIvc1p13TJ7cJ_NXpgNLfSPjy",
+          "mode": "list",
+          "cachedResultName": "Everyday_Health_and_Wellness_RAG_Knowledge_Base.docx",
+          "cachedResultUrl": "https://docs.google.com/document/d/1z6-_beuxIvc1p13TJ7cJ_NXpgNLfSPjy/edit?usp=drivesdk&ouid=108100472243369049914&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "43deae4f-98c1-488c-bd37-65b69633753f",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ChtLrK5d0F63x0t1",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        -112
+      ],
+      "id": "b9d2454b-0ff5-48e6-ac96-b93a57359594",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        128
+      ],
+      "id": "9733493b-cc8d-40b9-8668-e6cc81144a85",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful Everyday Health and Wellness assistant. Your primary responsibility is to answer user questions using only the information retrieved from the connected RAG knowledge base.\n\n## Core Instructions\n1. Use the connected Vector Store Tool to retrieve relevant information from the knowledge base before answering questions.\n2. Answer questions strictly based on the retrieved document content. Do not use your general knowledge, assumptions, or information from external sources to fill gaps.\n3. Provide clear, simple, accurate, and easy-to-understand answers.\n4. When relevant, organize answers using short paragraphs or bullet points.\n5. Preserve the facts, recommendations, and numerical values stated in the knowledge base. Do not change or invent figures.\n6. If the retrieved information does not answer the question, clearly state: \"I couldn't find that information in the provided knowledge base.\"\n7. If the question is unrelated to the document's scope, politely explain that you can only answer questions about the topics covered in the Everyday Health and Wellness knowledge base.\n8. Do not claim that information comes from the document unless it is supported by retrieved content.\n\n## Health and Safety Guidelines\n1. The knowledge base provides general educational information, not personalized medical advice.\n2. Do not diagnose medical conditions, recommend specific medicines, or provide personalized treatment plans.\n3. Do not invent personalized water-intake targets, calorie requirements, or other health recommendations that are not provided in the knowledge base.\n4. If a user asks for a diagnosis, medication advice, or personalized medical guidance, explain that the knowledge base does not provide that information and recommend consulting a qualified healthcare professional where appropriate.\n\n## Response Format\n- Answer the user's question directly.\n- Use only relevant information retrieved from the knowledge base.\n- Include important numbers or recommendations exactly as stated in the retrieved content.\n- Keep answers concise but sufficiently informative.\n- If no relevant information is retrieved, do not guess or generate an answer from general knowledge.\n\n## Primary Objective\nYour goal is to demonstrate document-grounded question answering. Accuracy and faithful use of the retrieved knowledge base are more important than providing a broad answer. Never fabricate information to complete an answer."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1152,
+        -176
+      ],
+      "id": "60aba104-11f1-401c-98a6-432ab3544ba8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        944,
+        48
+      ],
+      "id": "24be9e16-84c1-4b40-bfdb-2552daf4c762",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "YLVUdNj42A6mQT0L",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        1088,
+        48
+      ],
+      "id": "1db22e8e-d91b-4504-ac2e-1e6f8138ee63",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        912,
+        -128
+      ],
+      "id": "0fe010fa-b5b9-4ca3-b4d4-f6b31ab5e019",
+      "name": "When chat message received",
+      "webhookId": "4f0a76a5-a618-43c3-a5ce-591e32185e26"
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        416,
+        128
+      ],
+      "id": "3245741a-1d6c-486c-a5c2-34aa04087d45",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "YLVUdNj42A6mQT0L",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the Everyday Health and Wellness RAG Knowledge Base for information about sleep habits, hydration, physical activity, and balanced eating. Retrieve relevant information from the document to answer the user's question accurately.\n\nUse this tool whenever the user asks about loan eligibility, minimum bureau score, maximum LTV, FOIR, loan tenor, applicant age at maturity, or other credit appraisal criteria.\n\nUse only information explicitly stated in the provided Credit Appraisal RAG Knowledge Base. Apply only the rules relevant to the identified loan product.\n\nDo not use general knowledge. Do not invent, estimate, assume, or substitute values. If the requested parameter is not specified in the knowledge base, state that it is not available in the provided policy.",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        1424,
+        -64
+      ],
+      "id": "c7c2e68a-6120-45e3-bfdd-7a4f1303af53",
+      "name": "Simple Vector Store2"
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        64
+      ],
+      "id": "e200bdfe-5adf-48fd-8f64-a1c9e53e0f55",
+      "name": "Embeddings Ollama2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "YLVUdNj42A6mQT0L",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Vector Store2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5bf951d8-ed03-467f-8e6c-aaa095fb465d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a4d7a030d7d717f1ba1bc4d81ac6c7937a11fdd43e9720b7283a8c36a7699da2"
+  },
+  "nodeGroups": [],
+  "id": "LTzQXPNR0eB6LAQ7",
+  "tags": []
+}
